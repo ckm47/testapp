@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camera Capture</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+    input {
+      margin: 20px;
+    }
+    .photo-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .photo-gallery img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      margin: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Take a Photo</h1>
+  <input type="file" accept="image/*" capture="environment" id="cameraInput">
+  <div class="photo-gallery" id="photoGallery"></div>
+
+  <script>
+    const cameraInput = document.getElementById('cameraInput');
+    const photoGallery = document.getElementById('photoGallery');
+
+    cameraInput.addEventListener('change', (event) => {
+      const files = event.target.files;
+      Array.from(files).forEach(file => {
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            photoGallery.appendChild(img);
+
+            // Clear the input value to allow re-triggering
+            cameraInput.value = '';
+            // Re-trigger the file input click
+            setTimeout(() => {
+              cameraInput.click();
+            }, 100);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    });
+
+    // Initially trigger the file input click
+    cameraInput.click();
+  </script>
+</body>
+</html>
