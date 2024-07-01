@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Native Camera Capture</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+      }
+      input {
+        margin: 20px;
+      }
+      img {
+        width: 100%;
+        max-width: 400px;
+        margin-top: 20px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Take a Photo</h1>
+    <input type="file" accept="image/*" capture="camera" id="cameraInput" />
+    <img id="photo" alt="Captured photo" />
+
+    <script>
+      const cameraInput = document.getElementById("cameraInput");
+      const photo = document.getElementById("photo");
+
+      cameraInput.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            photo.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    </script>
+  </body>
+</html>
