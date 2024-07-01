@@ -15,8 +15,14 @@
       margin: 0;
       background-color: #f0f0f0;
     }
-    input {
-      margin: 20px;
+    video {
+      display: block;
+      width: 100%;
+      max-width: 400px;
+      margin: 20px auto;
+    }
+    canvas {
+      display: none;
     }
     .photo-gallery {
       display: flex;
@@ -32,30 +38,59 @@
       border: 1px solid #ccc;
       border-radius: 8px;
     }
+    button {
+      margin: 10px;
+    }
   </style>
 </head>
 <body>
   <h1>Take a Photo</h1>
-  <input type="file" accept="image/*" capture="environment" id="cameraInput">
+  <video id="video" autoplay></video>
+  <button id="capture">Capture Photo</button>
+  <button id="stop">Stop Camera</button>
+  <canvas id="canvas"></canvas>
   <div class="photo-gallery" id="photoGallery"></div>
 
   <script>
-    const cameraInput = document.getElementById('cameraInput');
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
     const photoGallery = document.getElementById('photoGallery');
+    const captureButton = document.getElementById('capture');
+    const stopButton = document.getElementById('stop');
 
-    cameraInput.addEventListener('change', (event) => {
-      const files = event.target.files;
-      Array.from(files).forEach(file => {
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            photoGallery.appendChild(img);
-          };
-          reader.readAsDataURL(file);
-        }
+    // Access the device camera and stream to the video element
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(err => {
+        console.error('Error accessing the camera: ', err);
       });
+
+    // Capture a frame from the video stream
+    captureButton.addEventListener('click', () => {
+      const context = canvas.getContext('2d');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Convert the canvas image to a JPEG data URL
+      const dataUrl = canvas.toDataURL('image/jpeg');
+      const img = document.createElement('img');
+      img.src = dataUrl;
+      photoGallery.appendChild(img);
+    });
+
+    // Stop the video stream
+    stopButton.addEventListener('click', () => {
+      const stream = video.srcObject;
+      const tracks = stream.getTracks();
+
+      tracks.forEach(track => {
+        track.stop();
+      });
+
+      video.srcObject = null;
     });
   </script>
 </body>
