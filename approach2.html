@@ -18,15 +18,15 @@
     input {
       margin: 20px;
     }
-    .photo-gallery {
+    .photo-display {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
       margin-top: 20px;
     }
-    .photo-gallery img {
-      width: 100px;
-      height: 100px;
+    .photo-display img {
+      width: 300px;
+      height: 300px;
       object-fit: cover;
       margin: 5px;
       border: 1px solid #ccc;
@@ -37,28 +37,31 @@
 <body>
   <h1>Take a Photo</h1>
   <input type="file" accept="image/*" capture="environment" id="cameraInput">
-  <div class="photo-gallery" id="photoGallery"></div>
+  <div class="photo-display" id="photoDisplay">
+    <p id="fileType"></p>
+  </div>
 
   <script>
     const cameraInput = document.getElementById('cameraInput');
-    const photoGallery = document.getElementById('photoGallery');
+    const photoDisplay = document.getElementById('photoDisplay');
+    const fileTypeDisplay = document.getElementById('fileType');
 
     cameraInput.addEventListener('change', (event) => {
-      const files = event.target.files;
-      Array.from(files).forEach(file => {
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            photoGallery.appendChild(img);
-          };
-          reader.readAsDataURL(file);
-        }
-      });
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          photoDisplay.innerHTML = '';
+          photoDisplay.appendChild(img);
+          fileTypeDisplay.innerText = `File type: ${file.type}`;
+        };
+        reader.readAsDataURL(file);
+      }
       // Clear the input value to allow re-triggering
       cameraInput.value = '';
-      // Re-trigger the file input click
+      // Re-trigger the file input click after a short delay to ensure the change event is fired
       setTimeout(() => {
         cameraInput.click();
       }, 100);
